@@ -1,0 +1,35 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class ContinuousMovement : MonoBehaviour
+{
+    [SerializeField]
+    float speed = 2;
+    [SerializeField]
+    XRNode Left;
+
+    private XRRig rig;
+    private Vector2 movementAxis;
+    private bool sprint;
+    private CharacterController character;
+    void Start()
+    {
+        character = GetComponent<CharacterController>();
+        rig = GetComponent<XRRig>();
+    }
+    void Update()
+    {
+        InputDevice LeftController = InputDevices.GetDeviceAtXRNode(Left);
+        LeftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out movementAxis);
+    }
+
+    private void FixedUpdate()
+    {
+        Quaternion headYaw = Quaternion.Euler(0, rig.cameraGameObject.transform.eulerAngles.y, 0);
+        Vector3 direction = headYaw * new Vector3(movementAxis.x, 0, movementAxis.y);
+        character.Move(direction * Time.fixedDeltaTime * speed);
+    }
+}
